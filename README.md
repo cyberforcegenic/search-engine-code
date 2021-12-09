@@ -21,8 +21,6 @@ def load_documents():
     # open a filehandle to the gzipped Wikipedia dump
     with gzip.open('data/enwiki.latest-abstract.xml.gz', 'rb') as f:
         doc_id = 1
-        # iterparse will yield the entire `doc` element once it finds the
-        # closing `</doc>` tag
         for _, element in etree.iterparse(f, events=('end',), tag='doc'):
             title = element.findtext('./title')
             url = element.findtext('./url')
@@ -31,10 +29,7 @@ def load_documents():
             yield Abstract(ID=doc_id, title=title, url=url, abstract=abstract)
 
             doc_id += 1
-            # the `element.clear()` call will explicitly free up the memory
-            # used to store the element
-            element.clear()
-
+           
 {
     ...
     "london": [5245250, 2623812, 133455, 3672401, ...],
@@ -132,10 +127,7 @@ from .analysis import analyze
 
 @dataclass
 class Abstract:
-    # snip
     def analyze(self):
-        # Counter will create a dictionary counting the unique values in an array:
-        # {'london': 12, 'beer': 3, ...}
         self.term_frequencies = Counter(analyze(self.fulltext))
 
     def term_frequency(self, term):
@@ -146,7 +138,7 @@ def index_document(self, document):
         document.analyze()
 
 def search(self, query, search_type='AND', rank=True):
-    # snip
+
     if rank:
         return self.rank(analyzed_query, documents)
     return documents
@@ -167,9 +159,7 @@ def document_frequency(self, token):
     return len(self.index.get(token, set()))
 
 def inverse_document_frequency(self, token):
-    # Manning, Hinrich and Schütze use log10, so we do too, even though it
-    # doesn't really matter which log we use anyway
-    # https://nlp.stanford.edu/IR-book/html/htmledition/inverse-document-frequency-1.html
+
     return math.log10(len(self.documents) / self.document_frequency(token))
 
 def rank(self, analyzed_query, documents):
